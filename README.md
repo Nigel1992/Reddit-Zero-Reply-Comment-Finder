@@ -1,7 +1,7 @@
 # Reddit Zero Comments Tracker
 
 <p align="center">
-  <img src="icon128.png" alt="Extension Logo" width="128" height="128">
+![image](https://github.com/user-attachments/assets/efe72493-a62d-4d39-9981-8dbdea3f1b80)
 </p>
 
 <p align="center">
