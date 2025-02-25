@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Reddit Post Notifier",
+  "version": "1.0",
+  "description": "Notifies you when new posts are made in specified subreddits.",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    }
+  },
+  "options_page": "options.html",
+  "default_icon": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "web_accessible_resources": [{
+    "resources": ["notification.mp3"],
+    "matches": ["<all_urls>"]
+  }]
+}
