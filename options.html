@@ -632,24 +632,6 @@
         .warning-button:hover {
             background-color: #f0ad4e;
         }
-
-        .save-section {
-            margin: 20px 0;
-            padding: 15px;
-            background-color: var(--bg-secondary);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .save-section .primary-button {
-            min-width: 120px;
-        }
-
-        .save-section .status-message {
-            flex-grow: 1;
-        }
     </style>
 </head>
 <body>
@@ -678,7 +660,7 @@
                 </div>
 
                 <div class="feature-block">
-                    <h4> Notifications</h4>
+                    <h4>�� Notifications</h4>
                     <p>When new posts with zero comments are detected, you'll see a number badge on the extension icon. This number shows how many new posts are waiting for responses. Clicking the extension icon will show these posts, and the badge will reset.</p>
                 </div>
 
@@ -731,38 +713,32 @@
             <input type="password" id="passwordInput" placeholder="Enter your Reddit password">
         </div>
 
-        <div class="settings-section">
+        <div class="section">
             <h3>Subreddit Configuration</h3>
-            <div class="subreddit-list" id="subredditList">
-                <!-- Subreddit inputs will be added here -->
-            </div>
-            <button id="addSubreddit" class="secondary-button">Add Subreddit</button>
+            <label for="subredditInput">Subreddit URLs</label>
+            <p class="help-text">Enter one subreddit URL per line in the format: https://oauth.reddit.com/r/subreddit/new?limit=100</p>
+            <textarea id="subredditInput" placeholder="https://oauth.reddit.com/r/subreddit/new?limit=100"></textarea>
         </div>
 
-        <div class="save-section">
-            <button id="saveButton" class="primary-button">Save Settings</button>
-            <span id="statusMessage" class="status-message"></span>
-        </div>
-
-        <div class="settings-section">
+        <div class="section">
             <h3>Check Frequency</h3>
-            <div class="setting-group">
-                <div class="timer-input">
-                    <label for="checkFrequency">Check every</label>
-                    <div class="input-with-unit">
-                        <input 
-                            type="number" 
-                            id="checkFrequency" 
-                            min="1" 
-                            max="60" 
-                            value="5"
-                            placeholder="5">
-                        <span class="unit">minutes</span>
-                    </div>
+            <p class="help-text">Set how often the extension checks for new posts (in minutes). Default is 5 minutes.</p>
+            
+            <div class="timer-input">
+                <label for="checkFrequency">Check every</label>
+                <div class="input-with-unit">
+                    <input 
+                        type="number" 
+                        id="checkFrequency" 
+                        min="1" 
+                        max="60" 
+                        value="5"
+                        placeholder="5">
+                    <span class="unit">minutes</span>
                 </div>
-                <p class="range-info">Allowed range: 1-60 minutes</p>
-                <button id="saveFrequencyButton" class="secondary-button">Update Check Frequency</button>
             </div>
+            <p class="range-info">Allowed range: 1-60 minutes</p>
+            <button id="saveFrequencyButton" class="secondary-button">Update Check Frequency</button>
         </div>
 
         <div class="section">
@@ -798,6 +774,12 @@
             <h3>Extension Management</h3>
             <div class="actions-grid">
                 <div class="action-card">
+                    <h4>Save Settings</h4>
+                    <p>Save your Reddit API credentials and tracking preferences.</p>
+                    <button id="saveButton" class="primary-button">Save Settings</button>
+                </div>
+
+                <div class="action-card">
                     <h4>Debug Information</h4>
                     <p>View technical details for troubleshooting.</p>
                     <button id="debugButton" class="info-button">Show Debug Info</button>
@@ -817,6 +799,8 @@
             </div>
             <pre id="debugOutput" class="debug-output"></pre>
         </div>
+
+        <div id="statusMessage"></div>
 
         <footer class="copyright-footer">
             <div class="footer-content">
