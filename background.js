@@ -104,6 +104,22 @@ async function checkStorage() {
     console.log('Stored posts:', storage.zeroPosts || []);
 }
 
+async function createOffscreenDocument() {
+    try {
+        const existing = await chrome.offscreen.hasDocument();
+        if (!existing) {
+            await chrome.offscreen.createDocument({
+                url: 'audio.html',
+                reasons: ['AUDIO_PLAYBACK'],
+                justification: 'Play notification sound'
+            });
+            console.log('Offscreen document created for audio');
+        }
+    } catch (error) {
+        console.error('Error creating offscreen document:', error);
+    }
+}
+
 async function fetchNewPosts() {
     try {
         await checkStorage();
@@ -201,14 +217,21 @@ async function fetchNewPosts() {
             chrome.action.setBadgeText({ text: newPosts.length.toString() });
             chrome.action.setBadgeBackgroundColor({ color: '#FF0000' });
 
+            // Handle notification and sound
             const soundSettings = await chrome.storage.local.get(['soundEnabled']);
+            
+            if (soundSettings.soundEnabled) {
+                console.log('Playing notification sound');
+                await createOffscreenDocument();
+            }
+
             chrome.notifications.create('new-posts', {
                 type: 'basic',
                 iconUrl: 'icon128.png',
                 title: 'New Posts Found',
                 message: `Found ${newPosts.length} new posts with zero comments`,
                 priority: 2,
-                silent: !soundSettings.soundEnabled
+                silent: true  // We're handling the sound ourselves
             });
         }
 
@@ -381,5 +404,13 @@ chrome.notifications.onClicked.addListener((notificationId) => {
     if (notificationId === 'new-posts') {
         // Open the extension popup
         chrome.action.openPopup();
+    }
+});
+
+// Add message listener for audio completion
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === 'audio_ended') {
+        console.log('Audio playback completed');
+        chrome.offscreen.closeDocument();
     }
 });

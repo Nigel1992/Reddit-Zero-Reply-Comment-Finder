@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notification Sound</title>
+</head>
+<body>
+    <audio id="notificationSound" autoplay>
+        <source src="notification.mp3" type="audio/mpeg">
+    </audio>
+    <script>
+        const audio = document.getElementById('notificationSound');
+        audio.onended = () => {
+            chrome.runtime.sendMessage({ type: 'audio_ended' });
+        };
+    </script>
+</body>
+</html> 
