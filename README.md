@@ -1,7 +1,7 @@
 # Reddit Zero Comments Tracker
 
 <p align="center">
-![image](https://github.com/user-attachments/assets/efe72493-a62d-4d39-9981-8dbdea3f1b80)
+![image]([https://github.com/user-attachments/assets/efe72493-a62d-4d39-9981-8dbdea3f1b80](https://github-production-user-asset-6210df.s3.amazonaws.com/5491930/416446623-efe72493-a62d-4d39-9981-8dbdea3f1b80.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20250225%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250225T012606Z&X-Amz-Expires=300&X-Amz-Signature=adeb647f9df637234c06caab971c1b554c13bad1ef8d47fb6a746e57a6498cf6&X-Amz-SignedHeaders=host))
 </p>
 
 <p align="center">
