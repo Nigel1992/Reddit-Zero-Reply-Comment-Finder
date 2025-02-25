@@ -616,6 +616,22 @@
             top: 20px;
             right: 20px;
         }
+
+        .warning-button {
+            background-color: #f7b955;
+            color: #000000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            width: 100%;
+        }
+
+        .warning-button:hover {
+            background-color: #f0ad4e;
+        }
     </style>
 </head>
 <body>
@@ -767,6 +783,12 @@
                     <h4>Debug Information</h4>
                     <p>View technical details for troubleshooting.</p>
                     <button id="debugButton" class="info-button">Show Debug Info</button>
+                </div>
+
+                <div class="action-card">
+                    <h4>Clear Post History</h4>
+                    <p>Remove all saved post history without affecting your settings.</p>
+                    <button id="clearPostsButton" class="warning-button">Clear Posts</button>
                 </div>
 
                 <div class="action-card warning-card">

@@ -388,4 +388,51 @@ document.addEventListener("DOMContentLoaded", async function () {
         notificationSound.volume = volumeSlider.value / 100;
         notificationSound.play();
     });
+
+    // Clear posts button handler
+    document.getElementById('clearPostsButton').addEventListener('click', async function() {
+        if (confirm('Are you sure you want to clear all saved posts? This will not affect your settings.')) {
+            try {
+                // Get all storage keys
+                const storage = await chrome.storage.local.get(null);
+                const keysToKeep = [
+                    'client_id',
+                    'client_secret',
+                    'username',
+                    'password',
+                    'subredditLinks',
+                    'checkFrequency',
+                    'soundEnabled',
+                    'notificationVolume',
+                    'darkMode',
+                    'access_token',
+                    'token_expiry'
+                ];
+
+                // Create object with only the settings we want to keep
+                const settingsToKeep = {};
+                keysToKeep.forEach(key => {
+                    if (storage[key] !== undefined) {
+                        settingsToKeep[key] = storage[key];
+                    }
+                });
+
+                // Clear everything and restore settings
+                await chrome.storage.local.clear();
+                await chrome.storage.local.set(settingsToKeep);
+
+                // Reset badge
+                chrome.action.setBadgeText({ text: '' });
+
+                // Show success message
+                statusMessage.textContent = "✅ Post history cleared successfully!";
+                statusMessage.className = "success";
+
+            } catch (error) {
+                console.error('Error clearing posts:', error);
+                statusMessage.textContent = "❌ Error clearing posts: " + error.message;
+                statusMessage.className = "error";
+            }
+        }
+    });
 });
