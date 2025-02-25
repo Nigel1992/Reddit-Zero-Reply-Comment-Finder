@@ -288,16 +288,24 @@ document.addEventListener("DOMContentLoaded", async function () {
                     password: password,
                     subredditLinks: subreddits,
                     access_token: tokenData.access_token,
-                    token_expiry: Date.now() + (tokenData.expires_in * 1000),
-                    soundEnabled: soundEnabled.checked,
-                    notificationVolume: volumeSlider.value
+                    token_expiry: Date.now() + (tokenData.expires_in * 1000)
                 });
 
                 statusMessage.textContent = "✅ Credentials verified and settings saved!";
                 statusMessage.className = "success";
 
-                // Trigger initial fetch
-                chrome.runtime.sendMessage({ action: "fetchNewPosts" });
+                // Trigger immediate fetch with force refresh
+                chrome.runtime.sendMessage({ 
+                    action: "fetchNewPosts",
+                    forceRefresh: true
+                });
+
+                // Update status to show fetching
+                setTimeout(() => {
+                    if (statusMessage.className === "success") {
+                        statusMessage.textContent = "✅ Settings saved! Checking for new posts...";
+                    }
+                }, 1000);
 
             } catch (fetchError) {
                 if (fetchError.message === "Failed to fetch") {
@@ -424,8 +432,14 @@ document.addEventListener("DOMContentLoaded", async function () {
                 // Reset badge
                 chrome.action.setBadgeText({ text: '' });
 
+                // Trigger a new fetch
+                chrome.runtime.sendMessage({ 
+                    action: "fetchNewPosts",
+                    forceRefresh: true  // Add this flag to force a fresh fetch
+                });
+
                 // Show success message
-                statusMessage.textContent = "✅ Post history cleared successfully!";
+                statusMessage.textContent = "✅ Post history cleared and refreshing...";
                 statusMessage.className = "success";
 
             } catch (error) {

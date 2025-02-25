@@ -1,3 +1,22 @@
+console.log('Background script loaded!');
+
+// Create alarm for periodic fetching
+chrome.alarms.create('fetchPosts', {
+    periodInMinutes: 1 // Default to 1 minute
+});
+
+// Listen for alarm
+chrome.alarms.onAlarm.addListener((alarm) => {
+    if (alarm.name === 'fetchPosts') {
+        console.log('Alarm triggered fetch:', new Date().toLocaleTimeString());
+        fetchNewPosts();
+    }
+});
+
+// Initialize
+console.log('Initializing background script:', new Date().toLocaleTimeString());
+fetchNewPosts();
+
 // Fetch stored user settings
 async function getUserSettings() {
     const data = await chrome.storage.local.get(["client_id", "client_secret", "username", "password", "subredditLinks"]);
@@ -10,150 +29,234 @@ async function getUserSettings() {
     };
 }
 
-// Function to fetch an access token
+let lastPostIds = new Set();
+let lastFetchTime = 0;
+
 async function fetchAccessToken() {
-    const { clientId, clientSecret, username, password } = await getUserSettings();
-    if (!clientId || !clientSecret || !username || !password) {
-        console.error("Reddit API credentials are missing.");
-        return null;
-    }
-
-    const auth = btoa(`${clientId}:${clientSecret}`);
-    
     try {
-        await chrome.storage.local.remove('accessToken'); // Clear old token
+        console.log('Fetching access token...');
+        const settings = await chrome.storage.local.get([
+            'client_id',
+            'client_secret',
+            'username',
+            'password',
+            'access_token',
+            'token_expiry'
+        ]);
 
-        const response = await fetch("https://www.reddit.com/api/v1/access_token", {
-            method: "POST",
+        // Check if we have a valid token
+        if (settings.access_token && settings.token_expiry && Date.now() < settings.token_expiry) {
+            console.log('Using existing token');
+            return settings.access_token;
+        }
+
+        if (!settings.client_id || !settings.client_secret || !settings.username || !settings.password) {
+            console.log('Missing credentials');
+            return null;
+        }
+
+        const response = await fetch('https://www.reddit.com/api/v1/access_token', {
+            method: 'POST',
             headers: {
-                "Authorization": `Basic ${auth}`,
-                "User-Agent": "RedditTracker/1.0",
-                "Content-Type": "application/x-www-form-urlencoded"
+                'Authorization': `Basic ${btoa(`${settings.client_id}:${settings.client_secret}`)}`,
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'User-Agent': 'RedditTracker/1.0'
             },
-            body: new URLSearchParams({
-                grant_type: "password",
-                username: username,
-                password: password
-            })
+            body: `grant_type=password&username=${encodeURIComponent(settings.username)}&password=${encodeURIComponent(settings.password)}`
         });
 
-        if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+        if (!response.ok) {
+            console.error('Token fetch error:', response.status);
+            const errorText = await response.text();
+            console.error('Error details:', errorText);
+            return null;
+        }
 
         const data = await response.json();
-        if (!data.access_token) throw new Error("Failed to retrieve access token");
+        console.log('New token obtained');
+        
+        // Save new token
+        await chrome.storage.local.set({
+            access_token: data.access_token,
+            token_expiry: Date.now() + (data.expires_in * 1000)
+        });
 
-        await chrome.storage.local.set({ accessToken: data.access_token });
         return data.access_token;
-
     } catch (error) {
-        console.error("Failed to fetch access token:", error);
-        await chrome.storage.local.remove('accessToken');
+        console.error('Token fetch error:', error);
         return null;
     }
 }
 
-// Fetch new posts from user-defined subreddits
-async function fetchNewPosts(showSuccess = false) {
+// Create notification types
+chrome.notifications.create('', {
+    type: 'basic',
+    iconUrl: 'icon128.png',
+    title: 'Reddit Zero Comments Tracker',
+    message: 'Extension is running'
+});
+
+// Add this function to check storage
+async function checkStorage() {
+    console.log('Checking storage contents...');
+    const storage = await chrome.storage.local.get(null);
+    console.log('All storage:', storage);
+    console.log('Stored posts:', storage.zeroPosts || []);
+}
+
+async function fetchNewPosts() {
     try {
-        const accessToken = await fetchAccessToken();
-        if (!accessToken) {
-            if (showSuccess) {
-                chrome.runtime.sendMessage({
-                    action: "showStatus",
-                    status: "❌ Error: Could not validate credentials"
-                });
-            }
+        await checkStorage();
+        console.log('Starting fetchNewPosts...', new Date().toLocaleTimeString());
+        
+        const settings = await chrome.storage.local.get(['checkFrequency', 'subredditLinks']);
+        if (!settings.subredditLinks || settings.subredditLinks.length === 0) {
+            console.log('No subreddits configured');
             return;
         }
 
-        if (showSuccess) {
-            chrome.runtime.sendMessage({
-                action: "showStatus",
-                status: "✅ Credentials verified and posts fetched successfully!"
-            });
+        const accessToken = await fetchAccessToken();
+        if (!accessToken) {
+            console.error('No access token available');
+            return;
         }
 
-        const { subredditUrls } = await getUserSettings();
-        const storedData = await chrome.storage.local.get(["seenPosts", "allPosts", "lastCheckTime"]);
-        const seenPosts = storedData.seenPosts || [];
-        let allPosts = storedData.allPosts || [];
-        const lastCheckTime = storedData.lastCheckTime || 0;
+        // Get existing posts first
+        const storage = await chrome.storage.local.get('zeroPosts');
+        const existingPosts = storage.zeroPosts || [];
+        const existingIds = new Set(existingPosts.map(post => post.id));
+        
+        console.log('Existing post IDs:', Array.from(existingIds));
 
-        let updatedPosts = [];
+        const newPosts = [];
+        const currentPostIds = new Set();
 
-        for (const url of subredditUrls) {
+        for (const subredditUrl of settings.subredditLinks) {
             try {
-                const response = await fetch(url, {
-                    headers: {
-                        "Authorization": `Bearer ${accessToken}`,
-                        "User-Agent": "RedditTracker/1.0"
-                    }
-                });
+                const subredditName = subredditUrl.split('/r/')[1].split('/')[0];
+                console.log(`Checking r/${subredditName}...`);
 
-                if (!response.ok) continue;
+                const response = await fetch(
+                    `https://oauth.reddit.com/r/${subredditName}/new.json?limit=100&sort=new`,
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${accessToken}`,
+                            'User-Agent': 'RedditTracker/1.0'
+                        }
+                    }
+                );
+
+                if (!response.ok) {
+                    console.error(`Error fetching r/${subredditName}:`, response.status);
+                    continue;
+                }
 
                 const data = await response.json();
-                const fetchedPosts = data.data.children.map(post => ({
-                    url: post.data.url,
-                    title: post.data.title,
-                    author: post.data.author,
-                    subreddit: post.data.subreddit,
-                    created_utc: post.data.created_utc,
-                    id: post.data.id
-                }));
+                console.log(`Total posts fetched from r/${subredditName}:`, data.data.children.length);
+                
+                const zeroPosts = data.data.children
+                    .map(child => child.data)
+                    .filter(post => post.num_comments === 0);
 
-                updatedPosts = [...updatedPosts, ...fetchedPosts];
+                console.log(`Found ${zeroPosts.length} posts with 0 comments in r/${subredditName}`);
+                
+                // Process new posts with triple duplicate check
+                for (const post of zeroPosts) {
+                    // Skip if we've seen this post before in any way
+                    if (existingIds.has(post.id) || 
+                        currentPostIds.has(post.id) || 
+                        lastPostIds.has(post.id)) {
+                        console.log(`Skipping duplicate post: ${post.title}`);
+                        continue;
+                    }
+
+                    console.log('New zero-comment post:', {
+                        title: post.title,
+                        subreddit: post.subreddit,
+                        id: post.id,
+                        created: new Date(post.created_utc * 1000).toLocaleString()
+                    });
+
+                    currentPostIds.add(post.id);
+                    newPosts.push(post);
+                }
             } catch (error) {
-                console.error("Error fetching subreddit posts:", error);
+                console.error(`Error processing r/${subredditName}:`, error);
             }
         }
 
-        // Remove duplicates
-        updatedPosts = Array.from(new Map(updatedPosts.map(post => [post.url, post])).values());
+        console.log(`Total new posts found: ${newPosts.length}`);
 
-        // Sort by newest first
-        updatedPosts.sort((a, b) => b.created_utc - a.created_utc);
-
-        // Only count new posts for the badge
-        const newPosts = updatedPosts.filter(post => 
-            post.created_utc > lastCheckTime && 
-            !seenPosts.includes(post.url)
-        );
-
+        // Update storage with new posts
         if (newPosts.length > 0) {
-            await chrome.action.setBadgeText({ 
-                text: newPosts.length.toString() 
-            });
+            // Combine with existing posts, newest first
+            const allPosts = [...newPosts, ...existingPosts]
+                .sort((a, b) => b.created_utc - a.created_utc)
+                .slice(0, 100); // Keep most recent 100 posts
 
-            // If new posts were found, check if sound is enabled
-            const soundSettings = await chrome.storage.local.get(['soundEnabled', 'notificationVolume']);
+            console.log('Storing posts:', allPosts.length);
+            await chrome.storage.local.set({ 'zeroPosts': allPosts });
             
-            if (soundSettings.soundEnabled) {
-                const notificationSound = new Audio(chrome.runtime.getURL('notification.mp3'));
-                notificationSound.volume = (soundSettings.notificationVolume || 50) / 100;
-                notificationSound.play();
-            }
-        }
+            // Update badge and notification
+            chrome.action.setBadgeText({ text: newPosts.length.toString() });
+            chrome.action.setBadgeBackgroundColor({ color: '#FF0000' });
 
-        // Store everything
-        await chrome.storage.local.set({ 
-            allPosts: updatedPosts,
-            seenPosts: [...seenPosts, ...updatedPosts.map(post => post.url)],
-            lastCheckTime: Math.floor(Date.now() / 1000)
-        });
-    } catch (error) {
-        console.error("Fetch error:", error);
-        if (showSuccess) {
-            chrome.runtime.sendMessage({
-                action: "showStatus",
-                status: "❌ Error: " + error.message
+            const soundSettings = await chrome.storage.local.get(['soundEnabled']);
+            chrome.notifications.create('new-posts', {
+                type: 'basic',
+                iconUrl: 'icon128.png',
+                title: 'New Posts Found',
+                message: `Found ${newPosts.length} new posts with zero comments`,
+                priority: 2,
+                silent: !soundSettings.soundEnabled
             });
         }
+
+        // Update tracking
+        lastPostIds = currentPostIds;
+        lastFetchTime = Date.now();
+
+    } catch (error) {
+        console.error('Fetch error:', error);
     }
 }
 
-// Run every 30 seconds
-setInterval(fetchNewPosts, 30000);
+// Listen for messages
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    console.log('Message received:', message);
+    
+    if (message.action === "fetchNewPosts") {
+        console.log('Manual fetch triggered');
+        fetchNewPosts();
+    }
+    return false;
+});
+
+// Listen for installation
+chrome.runtime.onInstalled.addListener(() => {
+    console.log('Extension installed/updated:', new Date().toLocaleTimeString());
+    fetchNewPosts();
+});
+
+// Listen for startup
+chrome.runtime.onStartup.addListener(() => {
+    console.log('Browser started:', new Date().toLocaleTimeString());
+    fetchNewPosts();
+});
+
+// Listen for settings changes
+chrome.storage.onChanged.addListener((changes, namespace) => {
+    if (namespace === 'local' && changes.checkFrequency) {
+        console.log('Check frequency changed, updating interval');
+        fetchNewPosts();
+    }
+    if (namespace === 'local' && changes.zeroPosts) {
+        console.log('Posts storage changed:', {
+            oldValue: changes.zeroPosts.oldValue?.length || 0,
+            newValue: changes.zeroPosts.newValue?.length || 0
+        });
+    }
+});
 
 // Reset counter when the popup closes
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -199,31 +302,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return true; // Keep message channel open for async response
     }
     return false;
-});
-
-// Add alarm listener to verify timing
-chrome.alarms.onAlarm.addListener((alarm) => {
-    if (alarm.name === "fetchPosts") {
-        console.log("Alarm triggered at:", new Date().toISOString());
-        fetchNewPosts();
-    }
-});
-
-// Update the initial alarm creation
-chrome.runtime.onInstalled.addListener(async () => {
-    try {
-        const storedData = await chrome.storage.local.get(["checkFrequency"]);
-        const frequency = storedData.checkFrequency || 5; // Default to 5 minutes
-
-        await chrome.alarms.clear("fetchPosts");
-        await chrome.alarms.create("fetchPosts", {
-            periodInMinutes: frequency
-        });
-
-        fetchNewPosts();
-    } catch (error) {
-        console.error("Error setting up initial alarm:", error);
-    }
 });
 
 // Add to existing message listener
@@ -282,10 +360,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         })();
         return true; // Keep the message channel open
     }
-    if (message.action === "fetchNewPosts") {
-        fetchNewPosts(message.showSuccess);
-        return false;
-    }
     if (message.action === "showStatus") {
         // This will be handled by the options page
         return false;
@@ -299,5 +373,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const statusMessage = document.getElementById("statusMessage");
         statusMessage.textContent = message.status;
         statusMessage.className = message.status.includes("❌") ? "error" : "success";
+    }
+});
+
+// Add notification click handler
+chrome.notifications.onClicked.addListener((notificationId) => {
+    if (notificationId === 'new-posts') {
+        // Open the extension popup
+        chrome.action.openPopup();
     }
 });

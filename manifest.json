@@ -5,10 +5,13 @@
   "description": "Notifies you when new posts are made in specified subreddits.",
   "permissions": [
     "storage",
-    "activeTab"
+    "activeTab",
+    "alarms",
+    "notifications"
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "type": "module"
   },
   "action": {
     "default_popup": "popup.html",
@@ -25,7 +28,7 @@
     "128": "icon.png"
   },
   "web_accessible_resources": [{
-    "resources": ["notification.mp3"],
+    "resources": ["notification.mp3", "sound.html"],
     "matches": ["<all_urls>"]
   }]
 }

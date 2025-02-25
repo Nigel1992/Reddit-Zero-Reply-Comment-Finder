@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
+    console.log('Popup opened');
     const totalPostsElement = document.getElementById("totalPosts");
     const postsList = document.getElementById("postsList");
     const statusMessage = document.getElementById("statusMessage");
@@ -9,8 +10,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         'client_secret',
         'username',
         'password',
-        'subredditLinks'
+        'subredditLinks',
+        'zeroPosts'
     ]);
+
+    console.log('Settings loaded:', {
+        hasCredentials: !!settings.client_id,
+        hasSubreddits: settings.subredditLinks?.length > 0,
+        postCount: settings.zeroPosts?.length || 0
+    });
 
     // Check if essential settings are missing
     if (!settings.client_id || 
@@ -65,59 +73,29 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // Display posts in the popup
-    if (posts.length > 0) {
-        postsList.innerHTML = "";
-        posts
-            .sort((a, b) => b.created_utc - a.created_utc) // Sort by newest first
-            .forEach(post => {
-                const listItem = document.createElement("li");
-                
-                // Check if this is a new post
-                const isNewPost = post.created_utc > (lastCheckTime - 300); // Added 5-minute buffer
-                const isDeleted = post.is_deleted === true; // Explicitly check boolean value
-                
-                console.log("Post:", post.title, "Is deleted:", isDeleted); // Debug log
-                
-                if (isNewPost) {
-                    listItem.classList.add('new-post');
-                }
-                if (isDeleted) {
-                    listItem.classList.add('deleted-post');
-                }
+    const zeroPosts = settings.zeroPosts || [];
+    console.log('Posts to display:', zeroPosts.length);
+    
+    totalPostsElement.textContent = zeroPosts.length > 0 
+        ? `Found ${zeroPosts.length} posts with no comments` 
+        : 'No posts found';
 
-                // Calculate time difference
-                const postDate = new Date(post.created_utc * 1000);
-                const now = new Date();
-                const diffInSeconds = Math.floor((now - postDate) / 1000);
-                
-                let timeAgo;
-                if (diffInSeconds < 60) {
-                    timeAgo = `${diffInSeconds} seconds ago`;
-                } else if (diffInSeconds < 3600) {
-                    const minutes = Math.floor(diffInSeconds / 60);
-                    timeAgo = `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-                } else if (diffInSeconds < 86400) {
-                    const hours = Math.floor(diffInSeconds / 3600);
-                    timeAgo = `${hours} hour${hours > 1 ? 's' : ''} ago`;
-                } else {
-                    const days = Math.floor(diffInSeconds / 86400);
-                    timeAgo = `${days} day${days > 1 ? 's' : ''} ago`;
-                }
+    if (zeroPosts.length > 0) {
+        postsList.innerHTML = zeroPosts.map(post => `
+            <div class="post-item">
+                <a href="https://reddit.com${post.permalink}" target="_blank" class="post-title">
+                    ${post.title}
+                </a>
+                <div class="post-meta">
+                    Posted in r/${post.subreddit} • ${new Date(post.created_utc * 1000).toLocaleString()}
+                </div>
+            </div>
+        `).join('');
 
-                listItem.innerHTML = `
-                    <a href="${post.url}" target="_blank">${post.title}</a>
-                    <div class="post-details">
-                        <span><strong>Posted by:</strong> u/${post.author}</span><br>
-                        <span><strong>Subreddit:</strong> r/${post.subreddit}</span><br>
-                        <span><strong>Posted:</strong> ${timeAgo}</span>
-                        ${isNewPost ? '<span class="new-badge">NEW!</span>' : ''}
-                        ${isDeleted ? '<span class="deleted-badge">DELETED</span>' : ''}
-                    </div>
-                `;
-                postsList.appendChild(listItem);
-            });
+        // Clear badge when posts are viewed
+        chrome.action.setBadgeText({ text: '' });
     } else {
-        postsList.innerHTML = "<li>No posts found.</li>";
+        postsList.innerHTML = '<div class="no-posts">No posts with zero comments found yet.</div>';
     }
 
     // Handle settings button click to open the settings page

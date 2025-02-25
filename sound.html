@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sound Player</title>
+</head>
+<body>
+    <script>
+        async function playSound() {
+            try {
+                const settings = await chrome.storage.local.get(['notificationVolume']);
+                const volume = (settings.notificationVolume || 50) / 100;
+                
+                const audio = new Audio(chrome.runtime.getURL('notification.mp3'));
+                audio.volume = volume;
+                
+                await audio.play();
+                
+                // Close after playing
+                audio.onended = () => {
+                    window.close();
+                };
+            } catch (error) {
+                console.error('Error playing sound:', error);
+                window.close();
+            }
+        }
+
+        // Play sound when page loads
+        playSound();
+    </script>
+</body>
+</html> 
