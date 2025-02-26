@@ -7,9 +7,9 @@
 Find and be the first to respond to Reddit posts with zero comments.  
 *Be the conversation starter!*
 
-[![Version](https://img.shields.io/badge/version-2025.2.26-blue.svg)](https://github.com/Nigel1992/reddit-zero-comments-finder)
+[![Version](https://img.shields.io/badge/version-2025.2.26-blue.svg)](https://github.com/Nigel1992/Reddit-Zero-Reply-Comment-Finder)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Nigel1992/reddit-zero-comments-finder/pulls)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Nigel1992/Reddit-Zero-Reply-Comment-Finder/pulls)
 
 [Key Features](#-key-features) •
 [Installation](#-installation) •
@@ -60,7 +60,7 @@ Find and be the first to respond to Reddit posts with zero comments.
 ### Manual Installation
 ```bash
 # Clone the repository
-git clone https://github.com/Nigel1992/reddit-zero-comments-finder.git
+git clone https://github.com/Nigel1992/Reddit-Zero-Reply-Comment-Finder.git
 
 # Load in Chrome
 1. Open chrome://extensions
@@ -157,6 +157,6 @@ If you find this project helpful, please consider:
 <div align="center">
 Made with ❤️ by Nigel Hagen
 
-[Report Bug](https://github.com/Nigel1992/reddit-zero-comments-finder/issues) •
-[Request Feature](https://github.com/Nigel1992/reddit-zero-comments-finder/issues)
+[Report Bug](https://github.com/Nigel1992/Reddit-Zero-Reply-Comment-Finder/issues) •
+[Request Feature](https://github.com/Nigel1992/Reddit-Zero-Reply-Comment-Finder/issues)
 </div>
