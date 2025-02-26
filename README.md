@@ -2,7 +2,7 @@
 
 # 🎯 Reddit Zero Comments Finder
 
-<img src="icon.png" alt="Extension Icon" width="128"/>
+<img src="https://static-00.iconduck.com/assets.00/reddit-logo-icon-2048x2048-vtzhwa71.png" alt="Extension Icon" width="128"/>
 
 Find and be the first to respond to Reddit posts with zero comments.  
 *Be the conversation starter!*
@@ -95,8 +95,8 @@ git clone https://github.com/yourusername/reddit-zero-comments-finder.git
 ## 📸 Screenshots
 
 <div align="center">
-<img src="screenshots/popup.png" alt="Popup Interface" width="400"/>
-<img src="screenshots/settings.png" alt="Settings Page" width="400"/>
+<img src="https://i.imgur.com/fb2AIWB.png" alt="Popup Interface" width="400"/>
+<img src="https://i.imgur.com/zzQePFZ.png" alt="Settings Page" width="400"/>
 </div>
 
 ## 🛠️ Technical Stack
