@@ -96,6 +96,7 @@ git clone https://github.com/yourusername/reddit-zero-comments-finder.git
 
 <div align="center">
 <img src="https://i.imgur.com/fb2AIWB.png" alt="Popup Interface" width="400"/>
+<br>
 <img src="https://i.imgur.com/zzQePFZ.png" alt="Settings Page" width="400"/>
 </div>
 
