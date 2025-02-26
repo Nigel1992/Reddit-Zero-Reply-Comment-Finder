@@ -93,12 +93,14 @@ document.addEventListener("DOMContentLoaded", async function () {
                 // Show success message
                 statusMessage.textContent = "✅ Extension has been reset successfully!";
                 statusMessage.className = "success";
+                statusMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
                 // Optional: Reload the extension
                 chrome.runtime.reload();
             } catch (error) {
                 statusMessage.textContent = "❌ Error resetting extension: " + error.message;
                 statusMessage.className = "error";
+                statusMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
     });
@@ -232,11 +234,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Main save button handler (for API credentials and subreddits)
     saveButton.addEventListener("click", async function () {
         const originalButtonText = saveButton.textContent;
-        
-        try {
-            saveButton.disabled = true;
-            saveButton.textContent = "Validating...";
+        saveButton.disabled = true;
+        saveButton.textContent = "Saving...";
 
+        try {
             // Validate required fields
             const clientId = clientIDInput.value.trim();
             const clientSecret = clientSecretInput.value.trim();
@@ -293,6 +294,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
                 statusMessage.textContent = "✅ Credentials verified and settings saved!";
                 statusMessage.className = "success";
+                statusMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
                 // Trigger immediate fetch with force refresh
                 chrome.runtime.sendMessage({ 
@@ -325,6 +327,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             console.error("Save error:", error);
             statusMessage.textContent = "❌ Error: " + error.message;
             statusMessage.className = "error";
+            statusMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
         } finally {
             saveButton.disabled = false;
             saveButton.textContent = originalButtonText;

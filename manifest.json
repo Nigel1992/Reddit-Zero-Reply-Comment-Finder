@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Reddit Post Notifier",
-  "version": "1.0",
+  "version": "2025.2.26",
   "description": "Notifies you when new posts are made in specified subreddits.",
   "permissions": [
     "storage",
@@ -23,7 +23,7 @@
     }
   },
   "options_page": "options.html",
-  "default_icon": {
+  "icons": {
     "16": "icon.png",
     "48": "icon.png",
     "128": "icon.png"
