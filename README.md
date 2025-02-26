@@ -1,95 +1,60 @@
-# Reddit Zero Comments Tracker
+<div align="center">
 
-<p align="center">
-  A Chrome extension that helps you find and respond to Reddit posts with zero comments.
-</p>
+# 🎯 Reddit Zero Comments Finder
 
-## 🌟 Features
+<img src="icon.png" alt="Extension Icon" width="128"/>
 
-- **Real-time Tracking**: Monitor selected subreddits for posts with no comments
-- **Instant Notifications**: Badge counter and optional sound alerts for new posts
-- **Customizable Settings**: 
-  - Adjustable check frequency
-  - Sound notification controls
-  - Dark/Light mode support
-- **Privacy Focused**: All data stored locally, no external tracking
-- **User-Friendly Interface**: Clean, intuitive design with clear feedback
+Find and be the first to respond to Reddit posts with zero comments.  
+*Be the conversation starter!*
+
+[![Version](https://img.shields.io/badge/version-2025.2.26-blue.svg)](https://github.com/yourusername/reddit-zero-comments-finder)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/yourusername/reddit-zero-comments-finder/pulls)
+
+[Key Features](#-key-features) •
+[Installation](#-installation) •
+[Usage](#-usage) •
+[Screenshots](#-screenshots) •
+[Contributing](#-contributing)
+
+</div>
+
+## ✨ Key Features
+
+🔄 **Real-time Monitoring**
+- Track multiple subreddits simultaneously
+- Instant notifications for new zero-comment posts
+- Customizable check frequency (1-60 minutes)
+
+🎨 **Beautiful Interface**
+- Clean, modern design
+- Dark/Light mode support
+- Collapsible subreddit sections
+- NEW badges for recent posts
+
+🔔 **Smart Notifications**
+- Badge counter for new posts
+- Customizable sound alerts
+- Volume control
+- Desktop notifications
+
+🛡️ **Privacy Focused**
+- Local data storage only
+- No tracking or analytics
+- Direct Reddit API communication
+- Secure credential handling
+
+⚙️ **Powerful Settings**
+- Easy Reddit API setup
+- Flexible subreddit management
+- Debug information panel
+- Post history management
 
 ## 🚀 Installation
 
-1. [COMING SOON] Download from the [Chrome Web Store](your_store_link_here)
-2. Or install manually:
-   - Clone this repository
-   - Open Chrome and go to `chrome://extensions/`
-   - Enable "Developer mode"
-   - Click "Load unpacked"
-   - Select the extension directory
+### Chrome Web Store (Coming Soon)
+1. Visit the Chrome Web Store
+2. Search for "Reddit Zero Comments Finder"
+3. Click "Add to Chrome"
 
-## 🔧 Setup
-
-1. Create a Reddit API application at [reddit.com/prefs/apps](https://www.reddit.com/prefs/apps)
-2. Get your Client ID and Client Secret
-3. Open extension settings
-4. Enter your Reddit credentials
-5. Add subreddits to monitor
-6. Configure check frequency (optional)
-7. Enable sound notifications (optional)
-
-## 📱 Screenshots
-
-COMING SOON
-
-## 💡 How It Works
-
-The extension:
-1. Periodically checks specified subreddits
-2. Identifies posts with zero comments
-3. Updates badge counter with new posts
-4. Plays notification sound (if enabled)
-5. Displays posts in popup for easy access
-
-## 🛠️ Technical Details
-
-- Built with vanilla JavaScript
-- Uses Reddit API for data fetching
-- Chrome Storage API for settings
-- Chrome Badge API for notifications
-- Web Audio API for sound alerts
-
-## 🔒 Privacy
-
-- All credentials stored locally
-- No data collection or tracking
-- Direct Reddit API communication only
-- No third-party services used
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📝 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
-
-## 👤 Author
-
-**Nigel Hagen**
-- GitHub: [@Nigel1992](https://github.com/Nigel1992)
-
-## 🙏 Acknowledgments
-
-- Reddit API Documentation
-- Chrome Extension Developer Guide
-- All contributors and users
-
----
-
-<p align="center">
-  Made with ❤️ by Nigel Hagen
-</p>
+### Manual Installation
