@@ -7,6 +7,8 @@
 
 # 🎯 Reddit Zero Comments Finder
 
+[![Vibe Coded](https://img.shields.io/badge/Vibe_Coded-✨-8A2BE2?style=for-the-badge)](https://github.com)
+
 <img src="https://static-00.iconduck.com/assets.00/reddit-logo-icon-2048x2048-vtzhwa71.png" alt="Extension Icon" width="128"/>
 
 Find and be the first to respond to Reddit posts with zero comments.  
