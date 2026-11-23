@@ -145,29 +145,9 @@ Distributed under the MIT License. See `LICENSE` for more information.
 **Nigel Hagen**
 - GitHub: [@Nigel1992](https://github.com/Nigel1992)
 
-## 💖 Support
+## 💖 Support the Project
 
-If you find this project helpful, please consider:
-- Giving it a ⭐️ on GitHub
-- Sharing it with friends
-- Contributing to the code
+I build this project in my free time and don't need donations for myself. If you'd like to give something back, I'd kindly ask you to donate to a charity of your choice instead — they need it far more than I do. If you still prefer to support me directly in private, thank you so much; it's genuinely appreciated.
 
-## 🙏 Acknowledgments
-
-- Reddit API Documentation
-- Chrome Extension Developer Guide
-- Open Source Community
-- All contributors and users
-
----
-
-<div align="center">
-Made with ❤️ by Nigel Hagen
-
-[Report Bug](https://github.com/Nigel1992/Reddit-Zero-Reply-Comment-Finder/issues) •
-[Request Feature](https://github.com/Nigel1992/Reddit-Zero-Reply-Comment-Finder/issues)
-</div>
-
-## Support This Project
-
-Support this project! All donations go towards your chosen charity. You can pick any charity you'd like, and I will ensure the funds are sent their way. Please note that standard payment processing fees (Ko-fi & PayPal) will be deducted from the total. As a thank you, your name will be listed as a supporter/donor in this project. Feel free to email me at thedjskywalker@gmail.com for proof of the donation or to let me know which charity you've selected!
+[![Ko-Fi](https://img.shields.io/badge/Ko--Fi-Support%20me-FF5E5B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/nigel1992)
+[![PayPal](https://img.shields.io/badge/PayPal-Donate-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/donate/?hosted_button_id=KYV9ARF99ZSCE)
